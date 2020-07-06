@@ -1,0 +1,72 @@
+# docker-compose.yml
+version: '3'
+
+services:
+  postgres:
+    image: postgres
+    #restart: always
+    environment:
+      #- POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+  redis:
+    image: redis
+    restart: always
+    container_name: 'abozar_app_redis'
+    command: redis-server
+    ports:
+      - '6379:6379'
+  web:
+    build: .
+    restart: always
+    container_name: 'abozar_app_django'
+    command: bash -c 'python manage.py migrate && python manage.py runserver 0.0.0.0:8000'
+    volumes:
+      - .:/code
+    ports:
+      - '8000:8000'
+    depends_on:
+      - postgres
+  celery:
+    build: .
+    container_name: 'abozar_app_celery'
+    command: celery -A ApiWatchTower worker -B --concurrency=10
+    volumes:
+      - .:/code
+    links:
+      - redis
+    depends_on:
+      - web
+      - redis
+      - postgres
+  celery-beat:
+    build: .
+    restart: always
+    container_name: 'abozar_app_celery_beat'
+    command: celery -A ApiWatchTower beat -l info -S django
+    volumes:
+      - .:/code
+    links:
+      - redis
+    depends_on:
+      - web
+      - redis
+      - celery
+      - postgres
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana-storage:/var/lib/grafana
+#      - ./grafana-provisioning/:/etc/grafana/provisioning
+    depends_on:
+      - postgres
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=abozar

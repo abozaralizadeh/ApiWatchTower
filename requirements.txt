@@ -1,0 +1,7 @@
+django >= 2.1.6, < 3.0
+django-jet2
+celery
+redis
+django-celery-beat
+requests
+psycopg2-binary
