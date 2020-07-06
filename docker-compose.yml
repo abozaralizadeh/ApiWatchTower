@@ -4,7 +4,7 @@ version: '3'
 services:
   postgres:
     image: postgres
-    #restart: always
+    container_name: 'abozar_app_postgres'
     environment:
       #- POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_DB=postgres
@@ -60,6 +60,7 @@ services:
       - postgres
   grafana:
     image: grafana/grafana:latest
+    container_name: 'abozar_app_grafana'
     ports:
       - 3000:3000
     volumes:
