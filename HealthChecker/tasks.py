@@ -9,11 +9,6 @@ import re
 import json
 
 
-@periodic_task(run_every=(timedelta(seconds=30)), name='hello_worker')
-def hello():
-    print("worker is active.")
-
-
 @shared_task
 def check_health():
     rules = HealthCheckRule.objects.filter(enable=True)

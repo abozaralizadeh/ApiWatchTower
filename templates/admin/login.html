@@ -1,5 +1,16 @@
-<img style="background-color: transparent;
-                                     display: inline-block; margin-top: -120px;
-                                     position:center; width: 100%"
+
+<img style="background-color: transparent; display: inline-block; margin-top: -120px; position: center; width: 100%"
      src="/static/logo.png" alt="Api Watch Tower">
+
+<a href="/login" style="display: block; text-align: center; margin-left: 36%; margin-bottom: 20px;
+    margin-right: 36%; box-shadow: 0px 10px 14px -7px #3e7327; background: linear-gradient(to bottom, #77b55a 5%, #72b352 100%); background-color: #77b55a; border-radius: 11px; border: 2px solid #4b8f29; cursor: pointer; color: #ffffff; font-family: Arial; font-size: 27px; font-weight: bold; padding: 13px 39px; text-decoration: none; text-shadow: 0px 1px 0px #5b8a3c;">Azure AD Login</a>
+
+<h1 style="text-align: center;">OR</h1>
+
 {% extends "admin/login.html" %}
+{% load staticfiles %}
+
+{% block extrahead %}
+<meta name="author" content="Abozar Alizadeh miab">
+<link rel="shortcut icon" type="image/png" href="/static/favicon.png" />
+{% endblock %}

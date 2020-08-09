@@ -2,7 +2,12 @@
 
 {% load staticfiles %}
 
-{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+{% block extrahead %}
+<meta name="author" content="Abozar Alizadeh miab">
+<link rel="shortcut icon" type="image/png" href="/static/favicon.png" />
+{% endblock %}
+
+{% block title %}Api Watch Tower | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
 {% block branding %}
 <h1 id="site-name">

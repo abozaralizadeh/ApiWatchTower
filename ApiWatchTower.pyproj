@@ -33,8 +33,20 @@
     <Compile Include="ApiWatchTower\celery.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ApiWatchTower\get_env_settings.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="HealthChecker\admin.py" />
     <Compile Include="HealthChecker\apps.py" />
+    <Compile Include="HealthChecker\migrations\0001_initial.py" />
+    <Compile Include="HealthChecker\migrations\0002_auto_20200704_1853.py" />
+    <Compile Include="HealthChecker\migrations\0003_auto_20200705_1016.py" />
+    <Compile Include="HealthChecker\migrations\0004_auto_20200705_1307.py" />
+    <Compile Include="HealthChecker\migrations\0005_auto_20200705_1313.py" />
+    <Compile Include="HealthChecker\migrations\0006_auto_20200705_1648.py" />
+    <Compile Include="HealthChecker\migrations\0007_auto_20200705_1907.py" />
+    <Compile Include="HealthChecker\migrations\0008_auto_20200708_1902.py" />
+    <Compile Include="HealthChecker\migrations\0009_auto_20200730_1113.py" />
     <Compile Include="HealthChecker\migrations\__init__.py" />
     <Compile Include="HealthChecker\models.py" />
     <Compile Include="HealthChecker\tasks.py">
@@ -57,6 +69,7 @@
     <Content Include="Dockerfile">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="HealthChecker\static\favicon.png" />
     <Content Include="HealthChecker\templates\HealthChecker\index.html" />
     <Content Include="Pipfile" />
     <Content Include="Pipfile.lock" />

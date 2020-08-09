@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 import posixpath
+from .get_env_settings import get_env_value
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -23,14 +24,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '9eb09dcc-aa29-44db-8daa-12fa6e7f8359'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application references
 # https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-INSTALLED_APPS
 INSTALLED_APPS = [
-    # Add your apps here to enable them
     'jet.dashboard',
     'jet',
     'django.contrib.admin',
@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'HealthChecker',
     'django_celery_beat',
+    'HealthChecker.apps.HealthCheckerConfig',
 ]
 
 # Middleware framework
@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+#    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 ]
 
 ROOT_URLCONF = 'ApiWatchTower.urls'
@@ -62,7 +63,6 @@ ROOT_URLCONF = 'ApiWatchTower.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        #'DIRS': [],
         'DIRS': [os.path.join(BASE_DIR, 'templates/')],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -88,7 +88,7 @@ DATABASES = {
     },
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'AWT',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'postgres',
@@ -113,6 +113,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'azure_ad_auth.backends.AzureActiveDirectoryBackend',
+)
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 LANGUAGE_CODE = 'it'
@@ -124,12 +129,26 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 STATIC_URL = '/static/'
-STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['static']))
+#STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['static']))
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # celery
-broker_url = 'redis://localhost' 
-#app.conf.broker_url = 'redis://localhost:6379/0'
 
 CELERY_BROKER_URL = 'redis://abozar_app_redis:6379'
 CELERY_ACCEPT_CONTENT = ['json'] 
 CELERY_TASK_SERIALIZER = 'json'
+
+SESSION_COOKIE_SAMESITE = None
+
+# Azure
+LOGIN_REDIRECT_URL = '/admin/'
+AAD_TENANT_ID = get_env_value('AAD_TENANT_ID')
+AAD_CLIENT_ID = get_env_value('AAD_CLIENT_ID')
+#AAD_AUTHORITY = ''
+#AAD_SCOPE = ''
+AAD_RESPONSE_TYPE = 'id_token'
+AAD_EMAIL_FIELD = 'email'
+AAD_USER_STATIC_MAPPING = { 'is_staff': True } #, 'is_superuser': True 
+AAD_USER_MAPPING = { 'username': 'email', 'first_name': 'name' }
+AAD_GROUP_MAPPING = { 'admin':'admins', }
+AAD_GROUP_STATIC_MAPPING = {'members',}

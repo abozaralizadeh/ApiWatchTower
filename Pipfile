@@ -12,8 +12,8 @@ celery = "*"
 redis = "*"
 django-celery-beat = "*"
 requests = "*"
-psycopg2 = "*"
 psycopg2-binary = "*"
+azure-ad-auth = {git = "https://github.com/abozaralizadeh/django-azure-ad-auth.git"}
 
 [requires]
 python_version = "3.7"
