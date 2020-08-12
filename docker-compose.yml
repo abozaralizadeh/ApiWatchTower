@@ -28,8 +28,8 @@ services:
     restart: always
     container_name: 'abozar_app_django'
     command: bash -c 'python manage.py migrate && python manage.py runserver 0.0.0.0:8000'
-    volumes:
-      - .:/code
+#    volumes:
+#      - .:/code
     ports:
       - '8000:8000'
     depends_on:
@@ -41,8 +41,8 @@ services:
     build: .
     container_name: 'abozar_app_celery'
     command: celery -A ApiWatchTower worker -B --concurrency=10
-    volumes:
-      - .:/code
+#    volumes:
+#      - .:/code
     links:
       - redis
     depends_on:
@@ -57,8 +57,8 @@ services:
     restart: always
     container_name: 'abozar_app_celery_beat'
     command: celery -A ApiWatchTower beat -l info -S django --pidfile=
-    volumes:
-      - .:/code
+#    volumes:
+#      - .:/code
     links:
       - redis
     depends_on:
