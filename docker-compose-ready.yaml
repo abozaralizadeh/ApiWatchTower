@@ -1,0 +1,124 @@
+# docker-compose.yml
+version: '3'
+
+services:
+  postgres:
+    image: postgres
+    container_name: "postgres"
+    restart: always
+    environment:
+      - POSTGRES_DB=AWT
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    logging:
+        driver: none
+    expose:
+      - "5432"
+
+  redis:
+    image: redis
+    restart: always
+    container_name: "redis"
+    command: redis-server
+    expose:
+      - "6379"
+
+  migration:
+    image: abo0zar/api_watch_tower:latest
+    container_name: "abozar_app_migration"
+    command: python manage.py migrate
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    environment:
+      - AAD_TENANT_ID=34a8a6cd-0d53-4aa4-a1d5-5dd854433b2d
+      - AAD_CLIENT_ID=e5e24664-df2b-4492-8ff0-edcf3c72d53e
+
+  web:
+    image: abo0zar/api_watch_tower:latest
+    restart: always
+    container_name: "abozar_app_django"
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    links:
+      - redis
+      - postgres
+    depends_on:
+      - postgres
+      - migration
+    environment:
+      - HTTPS=on
+      - AAD_TENANT_ID=34a8a6cd-0d53-4aa4-a1d5-5dd854433b2d
+      - AAD_CLIENT_ID=e5e24664-df2b-4492-8ff0-edcf3c72d53e
+    labels:
+      kompose.service.type: LoadBalancer
+
+  celery:
+    image: abo0zar/api_watch_tower:latest
+    container_name: "abozar_app_celery"
+    command: celery -A ApiWatchTower worker -B --concurrency=10
+    links:
+      - redis
+      - postgres
+    depends_on:
+      - redis
+      - postgres
+      - migration
+      - web
+    environment:
+      - AAD_TENANT_ID=34a8a6cd-0d53-4aa4-a1d5-5dd854433b2d
+      - AAD_CLIENT_ID=e5e24664-df2b-4492-8ff0-edcf3c72d53e
+
+  celery-beat:
+    image: abo0zar/api_watch_tower:latest
+    restart: always
+    container_name: "abozar_app_celery_beat"
+    command: celery -A ApiWatchTower beat -l info -S django --pidfile=
+    links:
+      - redis
+      - postgres
+    depends_on:
+      - redis
+      - postgres
+      - migration
+      - web
+      - celery
+    environment:
+      - AAD_TENANT_ID=34a8a6cd-0d53-4aa4-a1d5-5dd854433b2d
+      - AAD_CLIENT_ID=e5e24664-df2b-4492-8ff0-edcf3c72d53e
+
+  grafana:
+    image: grafana/grafana:latest
+    restart: always
+    container_name: "abozar_app_grafana"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - grafana-config:/etc/grafana
+    depends_on:
+      - postgres
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=abozar
+#      - GF_SERVER_ROOT_URL=https://apiwatchtower.azurewebsites.net/grafana/
+      - GF_AUTH_AZUREAD_NAME=AZURE AD
+      - GF_AUTH_AZUREAD_ENABLED=true
+      - GF_AUTH_AZUREAD_ALLOW_SIGN_UP=ture
+      - GF_AUTH_AZUREAD_CLIENT_ID=e5e24664-df2b-4492-8ff0-edcf3c72d53e
+      - GF_AUTH_AZUREAD_CLIENT_SECRET=xxxxxx
+      - GF_AUTH_AZUREAD_SCOPES=openid email profile
+      - GF_AUTH_AZUREAD_AUTH_URL=https://login.microsoftonline.com/34a8a6cd-0d53-4aa4-a1d5-5dd854433b2d/oauth2/v2.0/authorize
+      - GF_AUTH_AZUREAD_TOKEN_URL=https://login.microsoftonline.com/34a8a6cd-0d53-4aa4-a1d5-5dd854433b2d/oauth2/v2.0/token
+#      - GF_AUTH_AZUREAD_ALLOWED_DOMAINS=
+#      - GF_AUTH_AZUREAD_ALLOWED_GROUPS=
+    ports:
+      - "3000:3000"
+
+volumes:
+    postgres-data:
+    grafana-storage:
+    grafana-config:
+

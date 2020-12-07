@@ -3,15 +3,16 @@ from __future__ import absolute_import, unicode_literals
 from .models import *
 from celery import shared_task
 from celery.task import periodic_task
-from datetime import timedelta
+from datetime import datetime, timedelta
 import requests
 import re
 import json
 
 
-#@periodic_task(run_every=(timedelta(seconds=30)), name='hello_worker')
-#def hello():
-#    print("worker is active.")
+@shared_task
+def clean_record(days):
+    records = HealthCheckRecord.objects.filter(timestamp__lte=datetime.now()-timedelta(days=days))
+    records.delete()
 
 
 @shared_task

@@ -60,9 +60,15 @@
     <Compile Include="ApiWatchTower\settings.py" />
     <Compile Include="ApiWatchTower\urls.py" />
     <Compile Include="ApiWatchTower\wsgi.py" />
+    <Compile Include="VERSION">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
+    <Content Include="docker-compose-ready.yaml">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="docker-compose.yml">
       <SubType>Code</SubType>
     </Content>

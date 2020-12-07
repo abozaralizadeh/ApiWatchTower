@@ -1,6 +1,7 @@
 from django.apps import AppConfig
 from django.db.models.signals import post_migrate
 from django.db.models import Q
+import os
 
 
 def my_callback(sender, **kwargs):
@@ -20,6 +21,8 @@ def my_callback(sender, **kwargs):
     admins = Group.objects.create(name='admins')
     admins_permissions = Permission.objects.all()
     admins.permissions.add(*admins_permissions)
+
+    User.objects.create_superuser(os.environ.get('AWT_ADMIN', 'admin'), os.environ.get('AWT_PASS', 'admin'))
 
 class HealthCheckerConfig(AppConfig):
     name = 'HealthChecker'

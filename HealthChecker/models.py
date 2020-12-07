@@ -6,7 +6,7 @@ class Header(models.Model):
     value = models.CharField(max_length=1024)
 
     def __str__(self):
-        return self.key
+        return self.key + " : " + self.value
 
 class ClientCertificate(models.Model):
     name = models.CharField(max_length=100)

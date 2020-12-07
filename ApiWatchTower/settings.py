@@ -88,11 +88,11 @@ DATABASES = {
     },
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'AWT',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'postgres',
-        'PORT': 5432,
+        'NAME': get_env_value('PG_DBNAME', 'AWT'),
+        'USER': get_env_value('PG_USERNAME', 'postgres'),
+        'PASSWORD': get_env_value('PG_PASSWORD', 'postgres'),
+        'HOST': get_env_value('PG_HOST', 'postgres'),
+        'PORT': get_env_value('PG_PORT', 5432)
     }
 }
 
@@ -120,8 +120,8 @@ AUTHENTICATION_BACKENDS = (
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
-LANGUAGE_CODE = 'it'
-TIME_ZONE = 'Europe/Rome'
+LANGUAGE_CODE = get_env_value('LANGUAGE_CODE', 'it')
+TIME_ZONE = get_env_value('TIME_ZONE', 'Europe/Rome')
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
@@ -134,7 +134,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # celery
 
-CELERY_BROKER_URL = 'redis://abozar_app_redis:6379'
+CELERY_BROKER_URL = 'redis://{}:{}'.format(get_env_value('REDIS_HOST', 'redis'), get_env_value('REDIS_PORT', '6379'))
 CELERY_ACCEPT_CONTENT = ['json'] 
 CELERY_TASK_SERIALIZER = 'json'
 
@@ -142,13 +142,18 @@ SESSION_COOKIE_SAMESITE = None
 
 # Azure
 LOGIN_REDIRECT_URL = '/admin/'
-AAD_TENANT_ID = get_env_value('AAD_TENANT_ID')
-AAD_CLIENT_ID = get_env_value('AAD_CLIENT_ID')
+AAD_TENANT_ID = get_env_value('AAD_TENANT_ID', '')
+AAD_CLIENT_ID = get_env_value('AAD_CLIENT_ID', '')
 #AAD_AUTHORITY = ''
 #AAD_SCOPE = ''
-AAD_RESPONSE_TYPE = 'id_token'
-AAD_EMAIL_FIELD = 'email'
+AAD_RESPONSE_TYPE = get_env_value('AAD_RESPONSE_TYPE', 'id_token')
+AAD_EMAIL_FIELD = get_env_value('AAD_EMAIL_FIELD', 'email')
 AAD_USER_STATIC_MAPPING = { 'is_staff': True } #, 'is_superuser': True 
 AAD_USER_MAPPING = { 'username': 'email', 'first_name': 'name' }
 AAD_GROUP_MAPPING = { 'admin':'admins', }
 AAD_GROUP_STATIC_MAPPING = {'members',}
+
+try:
+    HTTPS =  get_env_value('HTTPS')
+except:
+    HTTPS = 'off'
