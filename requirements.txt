@@ -1,8 +1,8 @@
 django >= 2.1.6, < 3.0
-django-jet2=1.0.12
-celery=4.47
-redis=3.5.3
-django-celery-beat=2.0.0
-requests=2.24.0
-psycopg2-binary=2.8.5
+django-jet2==1.0.12
+celery==4.47
+redis==3.5.3
+django-celery-beat==2.0.0
+requests==2.24.0
+psycopg2-binary==2.8.5
 git+https://github.com/abozaralizadeh/django-azure-ad-auth.git#egg=azure-ad-auth
