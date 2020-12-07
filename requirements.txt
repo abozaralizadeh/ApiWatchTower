@@ -5,4 +5,4 @@ redis==3.5.3
 django-celery-beat==2.0.0
 requests==2.24.0
 psycopg2-binary==2.8.5
-git+https://github.com/abozaralizadeh/django-azure-ad-auth.git#egg=azure-ad-auth
+git+https://github.com/abozaralizadeh/django-azure-ad-auth.git#egg=django-azure-ad-auth
