@@ -88,11 +88,11 @@ DATABASES = {
     },
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': get_env_value('PG_DBNAME', 'AWT'),
-        'USER': get_env_value('PG_USERNAME', 'postgres'),
-        'PASSWORD': get_env_value('PG_PASSWORD', 'postgres'),
-        'HOST': get_env_value('PG_HOST', 'postgres'),
-        'PORT': get_env_value('PG_PORT', 5432)
+        'NAME': get_env_value('AWT_PG_DBNAME', 'AWT'),
+        'USER': get_env_value('AWT_PG_USERNAME', 'postgres'),
+        'PASSWORD': get_env_value('AWT_PG_PASSWORD', 'postgres'),
+        'HOST': get_env_value('AWT_PG_HOST', 'postgres'),
+        'PORT': get_env_value('AWT_PG_PORT', 5432)
     }
 }
 
@@ -120,8 +120,8 @@ AUTHENTICATION_BACKENDS = (
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
-LANGUAGE_CODE = get_env_value('LANGUAGE_CODE', 'it')
-TIME_ZONE = get_env_value('TIME_ZONE', 'Europe/Rome')
+LANGUAGE_CODE = get_env_value('AWT_LANGUAGE_CODE', 'it')
+TIME_ZONE = get_env_value('AWT_TIME_ZONE', 'Europe/Rome')
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
@@ -134,7 +134,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # celery
 
-CELERY_BROKER_URL = 'redis://{}:{}'.format(get_env_value('REDIS_HOST', 'redis'), get_env_value('REDIS_PORT', '6379'))
+CELERY_BROKER_URL = 'redis://{}:{}'.format(get_env_value('AWT_REDIS_HOST', 'redis'), get_env_value('AWT_REDIS_PORT', '6379'))
 CELERY_ACCEPT_CONTENT = ['json'] 
 CELERY_TASK_SERIALIZER = 'json'
 
@@ -142,8 +142,8 @@ SESSION_COOKIE_SAMESITE = None
 
 # Azure
 LOGIN_REDIRECT_URL = '/admin/'
-AAD_TENANT_ID = get_env_value('AAD_TENANT_ID', '')
-AAD_CLIENT_ID = get_env_value('AAD_CLIENT_ID', '')
+AAD_TENANT_ID = get_env_value('AAD_TENANT_ID', 'xxxx')
+AAD_CLIENT_ID = get_env_value('AAD_CLIENT_ID', 'xxxx')
 #AAD_AUTHORITY = ''
 #AAD_SCOPE = ''
 AAD_RESPONSE_TYPE = get_env_value('AAD_RESPONSE_TYPE', 'id_token')
