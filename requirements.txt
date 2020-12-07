@@ -5,4 +5,4 @@ redis
 django-celery-beat
 requests
 psycopg2-binary
-git+https://github.com/abozaralizadeh/django-azure-ad-auth.git#egg=azure-ad-auth
+git+https://github.com/abozaralizadeh/django-azure-ad-auth.git#egg=django-azure-ad-auth
