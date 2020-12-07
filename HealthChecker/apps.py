@@ -22,7 +22,6 @@ def my_callback(sender, **kwargs):
     admins_permissions = Permission.objects.all()
     admins.permissions.add(*admins_permissions)
 
-    User.objects.create_superuser(os.environ.get('AWT_ADMIN', 'admin'), os.environ.get('AWT_PASS', 'admin'))
 
 class HealthCheckerConfig(AppConfig):
     name = 'HealthChecker'
