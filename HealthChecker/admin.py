@@ -8,8 +8,8 @@ class HealthCheckRuleAdmin(admin.ModelAdmin):
 
 @admin.register(HealthCheckRecord)
 class HealthCheckRecordAdmin(admin.ModelAdmin):
-    readonly_fields = ["id", "timestamp", "response_code", "response_body", "response_delay", "health_check_rule", "success", "error"]
-    fields = ('id', 'health_check_rule',('response_code', 'response_body'), 'response_delay', 'success', 'timestamp', 'error', 'error_description')
+    readonly_fields = ["id", "timestamp", "response_code", "request", "response_body", "response_delay", "health_check_rule", "success", "error"]
+    fields = ('id', 'health_check_rule', "request", ('response_code', 'response_body'), 'response_delay', 'success', 'timestamp', 'error', 'error_description')
     list_display = ('id', 'health_check_rule', 'response_code', 'response_delay', 'success', 'timestamp')
     search_fields = ['id', 'health_check_rule']
     list_filter = ('health_check_rule', 'response_code', 'success')

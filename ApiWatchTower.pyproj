@@ -20,6 +20,7 @@
     <WebBrowserUrl>http://localhost</WebBrowserUrl>
     <OutputPath>.</OutputPath>
     <SuppressCollectPythonCloudServiceFiles>true</SuppressCollectPythonCloudServiceFiles>
+    <PythonDebugWebServerCommandArguments>runserver --noreload --settings $(DjangoSettingsModule) 8000 $(CommandLineArguments)</PythonDebugWebServerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -47,6 +48,8 @@
     <Compile Include="HealthChecker\migrations\0007_auto_20200705_1907.py" />
     <Compile Include="HealthChecker\migrations\0008_auto_20200708_1902.py" />
     <Compile Include="HealthChecker\migrations\0009_auto_20200730_1113.py" />
+    <Compile Include="HealthChecker\migrations\0010_healthcheckrule_output_variables.py" />
+    <Compile Include="HealthChecker\migrations\0011_healthcheckrecord_request.py" />
     <Compile Include="HealthChecker\migrations\__init__.py" />
     <Compile Include="HealthChecker\models.py" />
     <Compile Include="HealthChecker\tasks.py">

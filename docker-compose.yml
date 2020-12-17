@@ -3,8 +3,9 @@ version: '3'
 
 services:
   postgres:
-    image: postgres
+    image: postgres:12
     container_name: 'abozar_app_postgres'
+    restart: always
     environment:
       #- POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_DB=AWT
@@ -13,13 +14,13 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - postgresData:/var/lib/postgresql/data
-    logging:
-        driver: none
+      - postgresDatas:/var/lib/postgresql/data
+#    logging:
+#        driver: none
   redis:
     image: redis
     restart: always
-    container_name: 'abozar_app_redis'
+    container_name: 'redis'
     command: redis-server
     ports:
       - '6379:6379'
@@ -27,7 +28,7 @@ services:
     build: .
     restart: always
     container_name: 'abozar_app_django'
-    command: bash -c 'python manage.py migrate && python manage.py runserver 0.0.0.0:8000'
+    command: bash -c 'python manage.py migrate auth && python manage.py migrate && python manage.py runserver 0.0.0.0:8000'
 #    volumes:
 #      - .:/code
     ports:
@@ -84,4 +85,4 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=abozar
 
 volumes:
-    postgresData:
+    postgresDatas:
