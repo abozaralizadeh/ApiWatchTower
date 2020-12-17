@@ -7,6 +7,10 @@ from datetime import datetime, timedelta
 import requests
 import re
 import json
+import redis
+from django.conf import settings
+
+r = redis.Redis(host=settings.AWT_REDIS_HOST, port=settings.AWT_REDIS_PORT, db=1,  decode_responses=True)
 
 
 @shared_task
@@ -18,7 +22,7 @@ def clean_record(days):
 @shared_task
 def check_health():
     rules = HealthCheckRule.objects.filter(enable=True)
-    print("health check starts to run " + str(rules.count()) + " rules")
+    print("Health check starts to run " + str(rules.count()) + " rules")
 
     for rule in rules:
         make_http_call.delay(rule.id)
@@ -33,8 +37,13 @@ def make_http_call(rule_id):
     success = False
     url = rule.url
 
+    url = populate_placeholders(url)
+
+    curl = "curl -X {} \"{}\"".format(str(rule.http_method).upper(), url)
+
     try:
         if rule.client_certificate:
+            curl += " --key {}_key.pem --cert {}_cert.pem".format(rule.client_certificate.name.replace(' ', ''), rule.client_certificate.name.replace(' ', ''))
             cert_file_path = rule.client_certificate.client_cert.path
             if rule.client_certificate.client_key:
                 key_file_path = rule.client_certificate.client_key.path
@@ -43,16 +52,21 @@ def make_http_call(rule_id):
                 cert = cert_file_path
         headers = {}
         for header in rule.headers.all():
-            headers[header.key] = header.value
+            hvalue = populate_placeholders(header.value)
+            headers[header.key] = hvalue
+            curl += " -H \"{}: {}\"".format(header.key, hvalue)
     
         if rule.http_method == 'get':
             r = requests.get(url, cert=cert, headers=headers, verify=False)
         elif rule.http_method == 'post':
+            data = ''
+            request_body = populate_placeholders(rule.request_body)
             try:
-                data = json.loads(rule.request_body)
+                data = json.loads(request_body)
                 data = json.dumps(data)
-            except:
-                data = rule.request_body
+            except Exception as e:
+                data = request_body
+            curl += " --data-raw \"{}\"".format(data)
 
             r = requests.post(url, data=data, cert=cert, headers=headers, verify=False)
         else:
@@ -60,7 +74,8 @@ def make_http_call(rule_id):
 
         try:
             payload = json.dumps(r.json(), sort_keys=True)
-        except:
+            cache_placeholders(r.json(), rule.output_variables)
+        except Exception as e:
             payload = str(r.content)
 
         try:
@@ -80,7 +95,8 @@ def make_http_call(rule_id):
             error = True
             error_description = "Status code or payload doesn't match to the expected ones!"
 
-        HealthCheckRecord.objects.create(response_code=r.status_code,
+        HealthCheckRecord.objects.create(request=curl,
+                                         response_code=r.status_code,
                                          response_body=payload,
                                          response_delay=float(r.elapsed.seconds + r.elapsed.microseconds / 1000000),
                                          health_check_rule=rule,
@@ -93,3 +109,32 @@ def make_http_call(rule_id):
         error_description = str(e)
         HealthCheckRecord.objects.create(health_check_rule=rule, success=False, 
                                          error=error, error_description=error_description)
+
+def populate_placeholders(input):
+    variables = re.findall(r'{{([a-zA-Z0-9._-]+)}}', input)
+    for variable in variables:
+        val = r.get(variable)
+        input = input.replace('{{' + variable + '}}', str(val))
+    
+    return input
+
+def cache_placeholders(json_payload, keys_string):
+    if not keys_string:
+        return
+    keys_string = keys_string.replace(' ', '').replace('\n', '')
+    keys = keys_string.split(',')
+    for key in keys:
+        name = ''
+        parts = key.split('=>')
+        if len(parts) == 2:
+            name = parts[1]
+        key = parts[0] 
+        ks = key.split('__')
+        v = json_payload
+        for k in ks:
+            v = v.get(k, v)
+
+        if name:
+            r.set(name, v)
+        else:
+            r.set(key, v)
