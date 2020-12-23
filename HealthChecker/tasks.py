@@ -42,25 +42,26 @@ def check_health():
         heads.add(current)
         
     for head in heads:
-        task = make_http_call.s(head.id)
-        launcher(head, task)
+        run_head_sync.s(head.id).apply_async()
 
     for rule in rules:
         if rule.id not in seen:
             make_http_call.s(rule.id).apply_async()
 
 
-def launcher(head, task):
+def launcher(head):
+    if head.enable:
+        make_http_call.s(head.id).apply_async().get(disable_sync_subtasks=False)
     nexts = head.nexts.all()
-    if not nexts or nexts.count() == 0:
-        task.apply_async()
-        return
 
     for next in nexts:
-        if next.enable:
-            task.link(make_http_call_overload.s(next.id))
-        launcher(next, task)
+        run_head_sync.s(next.id).apply_async()
 
+
+@shared_task
+def run_head_sync(rule_id):
+    rule = HealthCheckRule.objects.get(id=rule_id)
+    launcher(rule)
 
 @shared_task
 def make_http_call_overload(_, rule_id):
