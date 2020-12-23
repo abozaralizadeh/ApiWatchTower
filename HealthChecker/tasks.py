@@ -63,9 +63,11 @@ def run_head_sync(rule_id):
     rule = HealthCheckRule.objects.get(id=rule_id)
     launcher(rule)
 
+
 @shared_task
-def make_http_call_overload(_, rule_id):
+def make_http_call_linkable(_, rule_id):
     make_http_call(rule_id)
+
 
 @shared_task
 def make_http_call(rule_id):
