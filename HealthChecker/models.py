@@ -34,6 +34,7 @@ class HealthCheckRule(models.Model):
     expected_response_body = models.TextField(help_text='Regular Expression', default='.*', blank=True, null=True)
     enable = models.BooleanField(default=True)
     output_variables = models.TextField(help_text='keys seperated by comma', default='', blank=True, null=True)
+    run_after = models.ForeignKey('HealthCheckRule', on_delete=models.SET_NULL, related_name='nexts', blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):

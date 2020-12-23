@@ -50,6 +50,7 @@
     <Compile Include="HealthChecker\migrations\0009_auto_20200730_1113.py" />
     <Compile Include="HealthChecker\migrations\0010_healthcheckrule_output_variables.py" />
     <Compile Include="HealthChecker\migrations\0011_healthcheckrecord_request.py" />
+    <Compile Include="HealthChecker\migrations\0012_healthcheckrule_run_after.py" />
     <Compile Include="HealthChecker\migrations\__init__.py" />
     <Compile Include="HealthChecker\models.py" />
     <Compile Include="HealthChecker\tasks.py">

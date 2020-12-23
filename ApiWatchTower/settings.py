@@ -138,6 +138,7 @@ AWT_REDIS_HOST = get_env_value('AWT_REDIS_HOST', 'redis')
 AWT_REDIS_PORT = get_env_value('AWT_REDIS_PORT', 6379)
 
 CELERY_BROKER_URL = 'redis://{}:{}'.format(AWT_REDIS_HOST, AWT_REDIS_PORT)
+CELERY_RESULT_BACKEND = 'redis://{}:{}'.format(AWT_REDIS_HOST, AWT_REDIS_PORT)
 CELERY_ACCEPT_CONTENT = ['json'] 
 CELERY_TASK_SERIALIZER = 'json'
 

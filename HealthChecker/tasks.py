@@ -21,12 +21,50 @@ def clean_record(days):
 
 @shared_task
 def check_health():
+    heads = set()
+    seen = []
     rules = HealthCheckRule.objects.filter(enable=True)
     print("Health check starts to run " + str(rules.count()) + " rules")
 
-    for rule in rules:
-        make_http_call.delay(rule.id)
+    dependent_rules = rules.filter(run_after__isnull=False, enable=True)
 
+    for rule in dependent_rules:
+        if rule.id in seen:
+            continue
+        seen.append(rule.id)
+
+        current = rule
+
+        while current.run_after:
+            current = current.run_after
+            seen.append(current.id)
+
+        heads.add(current)
+        
+    for head in heads:
+        task = make_http_call.s(head.id)
+        launcher(head, task)
+
+    for rule in rules:
+        if rule.id not in seen:
+            make_http_call.s(rule.id).apply_async()
+
+
+def launcher(head, task):
+    nexts = head.nexts.all()
+    if not nexts or nexts.count() == 0:
+        task.apply_async()
+        return
+
+    for next in nexts:
+        if next.enable:
+            task.link(make_http_call_overload.s(next.id))
+        launcher(next, task)
+
+
+@shared_task
+def make_http_call_overload(_, rule_id):
+    make_http_call(rule_id)
 
 @shared_task
 def make_http_call(rule_id):
