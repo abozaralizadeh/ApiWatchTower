@@ -21,11 +21,52 @@ def clean_record(days):
 
 @shared_task
 def check_health():
+    heads = set()
+    seen = []
     rules = HealthCheckRule.objects.filter(enable=True)
     print("Health check starts to run " + str(rules.count()) + " rules")
 
+    dependent_rules = rules.filter(run_after__isnull=False, enable=True)
+
+    for rule in dependent_rules:
+        if rule.id in seen:
+            continue
+        seen.append(rule.id)
+
+        current = rule
+
+        while current.run_after:
+            current = current.run_after
+            seen.append(current.id)
+
+        heads.add(current)
+        
+    for head in heads:
+        run_head_sync.s(head.id).apply_async()
+
     for rule in rules:
-        make_http_call.delay(rule.id)
+        if rule.id not in seen:
+            make_http_call.s(rule.id).apply_async()
+
+
+def launcher(head):
+    if head.enable:
+        make_http_call.s(head.id).apply_async().get(disable_sync_subtasks=False)
+    nexts = head.nexts.all()
+
+    for next in nexts:
+        run_head_sync.s(next.id).apply_async()
+
+
+@shared_task
+def run_head_sync(rule_id):
+    rule = HealthCheckRule.objects.get(id=rule_id)
+    launcher(rule)
+
+
+@shared_task
+def make_http_call_linkable(_, rule_id):
+    make_http_call(rule_id)
 
 
 @shared_task
