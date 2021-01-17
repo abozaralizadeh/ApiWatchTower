@@ -7,7 +7,7 @@ AWT is an open-source Django application for deep real-time API monitoring by pe
 ## Demo (AWT Single Container)
 
 To see the demo without applying any configuration, you can use the single container here: [abo0zar/single_awt](https://hub.docker.com/repository/docker/abo0zar/single_awt)
-This demo is doesn't support all the features and might not be updated in future and should not be used in production environments. 
+This demo doesn't support all the features and might not be updated in future and should not be used in production environments. 
 this container is already active and has all the components (like Postgres, Grafana, configurations, etc) needed to run AWT.
 
 After running the container access to the django admin on **http://localhost/admin** and grafana on **http://localhost/grafana**
@@ -164,6 +164,7 @@ Can have the values 'on' and 'off'
 **default:** 5432
 
 There are also some settings related to the configuration of Azure Active Directory login that can be find here: [django-azure-ad-auth](https://github.com/abozaralizadeh/django-azure-ad-auth)
+
 Also to configure Grafana you can visit the official documentations but some usefull configurations are suggested here:
 
 #### GF_SECURITY_ADMIN_USER
