@@ -130,7 +130,7 @@ Can have the values 'on' and 'off'
 
 There are also some settings related to the configuration of Azure Active Directory login that can be find here: [django-azure-ad-auth](https://github.com/abozaralizadeh/django-azure-ad-auth)
 
-Also to configure Grafana you can visit the official documentations but some usefull configurations are suggested here:
+Also to configure Grafana you can visit the official documentations but some useful configurations are suggested here:
 
 #### GF_SECURITY_ADMIN_USER
 #### GF_SECURITY_ADMIN_PASSWORD
