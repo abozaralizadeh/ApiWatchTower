@@ -2,12 +2,52 @@
 
 # Api Watch Tower (AWT)
 
-AWT is an open-source Django application for deep real-time API monitoring by periodical calls and evaluating the results, not only as a health checker but also for controlling the integrity and getting alerts in case of any unexpected changes to the result payload itself. aimed to use along with other tools like Grafana to Visualise the data and setting alert systems.
+AWT is an open-source Django application for deep real-time API monitoring by periodical calls and evaluating the results, not only as a health checker but also for controlling the integrity and getting alerts in case of any unexpected changes to the result payload itself. Aimed to use along with other tools like Grafana to visualise the data and setting alert systems.
 
+## Demo (AWT Single Container)
+
+To see the demo without applying any configuration, you can use the single container here: [abo0zar/single_awt](https://hub.docker.com/repository/docker/abo0zar/single_awt)
+This demo is doesn't support all the features and might not be updated in future and should not be used in production environments. 
+this container is already active and has all the components (like Postgres, Grafana, configurations, etc) needed to run AWT.
+
+After running the container access to the django admin on **http://localhost/admin** and grafana on **http://localhost/grafana**
+and use the default username: admin - password: admin.
+
+
+
+```yml
+# docker-compose.yml
+
+version: '3'
+
+services:
+  awt:
+    image: abo0zar/single_awt:latest
+    restart: always
+    command: bash startup_awt
+    ports:
+      - "80:80"
+    environment:
+      - AAD_TENANT_ID=xxxOptionalxxx
+      - AAD_CLIENT_ID=xxxOptionalxxx
+      - HTTPS=off
+    volumes:
+      - grafanaStorage:/var/lib/grafana
+      - postgresData:/var/lib/postgresql/12/main
+      - grafanaConfig:/etc/grafana
+
+volumes:
+    postgresData:
+    grafanaStorage:
+    grafanaConfig:
+
+```
 
 ## Installation
 
 The easiest way to setup is using the docker container ([abo0zar/api_watch_tower:latest](https://hub.docker.com/repository/docker/abo0zar/api_watch_tower)) using the following Yaml file:
+
+
 
 ```yml
 # docker-compose.yml
@@ -83,7 +123,53 @@ volumes:
 
 ```
 
+## Requirements
 
+AWT works with Postgres as the database and to monitor the results you can use grafana. 
+Also Redis is used as a broker for AWT celery workers.
+
+## Configurations
+
+The following environment variables can be passed to all the containers that use AWT docker image:
+
+#### HTTPS
+**default:** off
+Can have the values 'on' and 'off'
+
+#### AWT_REDIS_HOST
+**default:** redis
+
+#### AWT_REDIS_PORT
+**default:** 6379
+
+#### AWT_LANGUAGE_CODE
+**default:** it
+
+#### AWT_TIME_ZONE
+**default:** Europe/Rome
+
+#### AWT_PG_DBNAME
+**default:** AWT
+
+#### AWT_PG_USERNAME
+**default:** postgres
+
+#### AWT_PG_PASSWORD
+**default:** postgres
+
+#### AWT_PG_HOST
+**default:** postgres
+
+#### AWT_PG_PORT
+**default:** 5432
+
+There are also some settings related to the configuration of Azure Active Directory login that can be find here: [django-azure-ad-auth](https://github.com/abozaralizadeh/django-azure-ad-auth)
+Also to configure Grafana you can visit the official documentations but some usefull configurations are suggested here:
+
+#### GF_SECURITY_ADMIN_USER
+#### GF_SECURITY_ADMIN_PASSWORD
+#### GF_SERVER_ROOT_URL
+#### GF_INSTALL_PLUGINS
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
@@ -91,7 +177,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Please make sure to update tests as appropriate.
 
 ## License
-[MIT License](https://choosealicense.com/licenses/mit/) 
+[MIT License](https://bitbucket.org/m4x4m/apiwatchtower/src/master/LICENSE) 
 
 Copyright (c) 2021 Abozar Alizadeh
 
