@@ -4,44 +4,8 @@
 
 AWT is an open-source Django application for deep real-time API monitoring by periodical calls and evaluating the results, not only as a health checker but also for controlling the integrity and getting alerts in case of any unexpected changes to the result payload itself. Aimed to use along with other tools like Grafana to visualise the data and setting alert systems.
 
-## Demo (AWT Single Container)
-
 To see the demo without applying any configuration, you can use the single container here: [abo0zar/single_awt](https://hub.docker.com/repository/docker/abo0zar/single_awt)
-This demo doesn't support all the features and might not be updated in future and should not be used in production environments. 
-this container is already active and has all the components (like Postgres, Grafana, configurations, etc) needed to run AWT.
 
-After running the container access to the django admin on **http://localhost/admin** and grafana on **http://localhost/grafana**
-and use the default username: admin - password: admin.
-
-
-
-```yml
-# docker-compose.yml
-
-version: '3'
-
-services:
-  awt:
-    image: abo0zar/single_awt:latest
-    restart: always
-    command: bash startup_awt
-    ports:
-      - "80:80"
-    environment:
-      - AAD_TENANT_ID=xxxOptionalxxx
-      - AAD_CLIENT_ID=xxxOptionalxxx
-      - HTTPS=off
-    volumes:
-      - grafanaStorage:/var/lib/grafana
-      - postgresData:/var/lib/postgresql/12/main
-      - grafanaConfig:/etc/grafana
-
-volumes:
-    postgresData:
-    grafanaStorage:
-    grafanaConfig:
-
-```
 
 ## Installation
 
@@ -126,7 +90,8 @@ volumes:
 ## Requirements
 
 AWT works with Postgres as the database and to monitor the results you can use grafana. 
-Also Redis is used as a broker for AWT celery workers.
+Also Redis is used as a broker for AWT celery workers. use nginx to serve both AWT and Grafana on the same port if needed, in that case yu need to run grafana behind a reverse proxy,
+visit grafana documentation to achieve to that goal here: [run grafana behind a proxy](https://grafana.com/tutorials/run-grafana-behind-a-proxy/#2)
 
 ## Configurations
 
