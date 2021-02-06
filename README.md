@@ -87,6 +87,9 @@ volumes:
 
 ```
 
+
+For more info visit [this post](https://abozar-alizadeh.medium.com/api-watch-tower-7f222f1e0eb4).
+
 ## Requirements
 
 AWT works with Postgres as the database and to monitor the results you can use grafana. 
