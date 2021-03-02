@@ -50,10 +50,11 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-#    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    #    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 ]
 
 ROOT_URLCONF = 'ApiWatchTower.urls'
@@ -129,7 +130,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 STATIC_URL = '/static/'
-#STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['static']))
+# STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['static']))
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # celery
@@ -139,7 +140,7 @@ AWT_REDIS_PORT = get_env_value('AWT_REDIS_PORT', 6379)
 
 CELERY_BROKER_URL = 'redis://{}:{}'.format(AWT_REDIS_HOST, AWT_REDIS_PORT)
 CELERY_RESULT_BACKEND = 'redis://{}:{}'.format(AWT_REDIS_HOST, AWT_REDIS_PORT)
-CELERY_ACCEPT_CONTENT = ['json'] 
+CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
 SESSION_COOKIE_SAMESITE = None
@@ -148,16 +149,16 @@ SESSION_COOKIE_SAMESITE = None
 LOGIN_REDIRECT_URL = '/admin/'
 AAD_TENANT_ID = get_env_value('AAD_TENANT_ID', 'xxxx')
 AAD_CLIENT_ID = get_env_value('AAD_CLIENT_ID', 'xxxx')
-#AAD_AUTHORITY = ''
-#AAD_SCOPE = ''
+# AAD_AUTHORITY = ''
+# AAD_SCOPE = ''
 AAD_RESPONSE_TYPE = get_env_value('AAD_RESPONSE_TYPE', 'id_token')
 AAD_EMAIL_FIELD = get_env_value('AAD_EMAIL_FIELD', 'email')
-AAD_USER_STATIC_MAPPING = { 'is_staff': True } #, 'is_superuser': True 
-AAD_USER_MAPPING = { 'username': 'email', 'first_name': 'name' }
-AAD_GROUP_MAPPING = { 'admin':'admins', }
-AAD_GROUP_STATIC_MAPPING = {'members',}
+AAD_USER_STATIC_MAPPING = {'is_staff': True}  # , 'is_superuser': True
+AAD_USER_MAPPING = {'username': 'email', 'first_name': 'name'}
+AAD_GROUP_MAPPING = {'admin': 'admins', }
+AAD_GROUP_STATIC_MAPPING = {'members', }
 
 try:
-    HTTPS =  get_env_value('HTTPS')
+    HTTPS = get_env_value('HTTPS')
 except:
     HTTPS = 'off'

@@ -117,5 +117,8 @@ GitHub.sublime-settings
 .history
 obj
 
+# AWT #
 grafana-storage/*
 postgres-data/*
+ApiWatchTower/settings_test.py
+certificates/

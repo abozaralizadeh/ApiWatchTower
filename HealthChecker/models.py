@@ -8,6 +8,7 @@ class Header(models.Model):
     def __str__(self):
         return self.key + " : " + self.value
 
+
 class ClientCertificate(models.Model):
     name = models.CharField(max_length=100)
     client_cert = models.FileField(help_text='Use .pem cert file', upload_to='certificates/')
@@ -15,6 +16,7 @@ class ClientCertificate(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class HealthCheckRule(models.Model):
     name = models.CharField(max_length=100)
@@ -30,15 +32,18 @@ class HealthCheckRule(models.Model):
     headers = models.ManyToManyField(Header, blank=True)
     request_body = models.TextField(blank=True, null=True)
     client_certificate = models.ForeignKey(ClientCertificate, on_delete=models.SET_NULL, blank=True, null=True)
-    expected_response_code = models.CharField(max_length=8, help_text='Regular Expression', default='200', blank=True, null=True)
+    expected_response_code = models.CharField(max_length=8, help_text='Regular Expression', default='200', blank=True,
+                                              null=True)
     expected_response_body = models.TextField(help_text='Regular Expression', default='.*', blank=True, null=True)
     enable = models.BooleanField(default=True)
     output_variables = models.TextField(help_text='keys seperated by comma', default='', blank=True, null=True)
-    run_after = models.ForeignKey('HealthCheckRule', on_delete=models.SET_NULL, related_name='nexts', blank=True, null=True)
+    run_after = models.ForeignKey('HealthCheckRule', on_delete=models.SET_NULL, related_name='nexts', blank=True,
+                                  null=True)
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
+
 
 class HealthCheckRecord(models.Model):
     request = models.TextField(blank=True, null=True)

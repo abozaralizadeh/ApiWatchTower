@@ -10,12 +10,12 @@ import json
 import redis
 from django.conf import settings
 
-r = redis.Redis(host=settings.AWT_REDIS_HOST, port=settings.AWT_REDIS_PORT, db=1,  decode_responses=True)
+r = redis.Redis(host=settings.AWT_REDIS_HOST, port=settings.AWT_REDIS_PORT, db=1, decode_responses=True)
 
 
 @shared_task
 def clean_record(days):
-    records = HealthCheckRecord.objects.filter(timestamp__lte=datetime.now()-timedelta(days=days))
+    records = HealthCheckRecord.objects.filter(timestamp__lte=datetime.now() - timedelta(days=days))
     records.delete()
 
 
@@ -40,7 +40,7 @@ def check_health():
             seen.append(current.id)
 
         heads.add(current)
-        
+
     for head in heads:
         run_head_sync.s(head.id).apply_async()
 
@@ -84,7 +84,8 @@ def make_http_call(rule_id):
 
     try:
         if rule.client_certificate:
-            curl += " --key {}_key.pem --cert {}_cert.pem".format(rule.client_certificate.name.replace(' ', ''), rule.client_certificate.name.replace(' ', ''))
+            curl += " --key {}_key.pem --cert {}_cert.pem".format(rule.client_certificate.name.replace(' ', ''),
+                                                                  rule.client_certificate.name.replace(' ', ''))
             cert_file_path = rule.client_certificate.client_cert.path
             if rule.client_certificate.client_key:
                 key_file_path = rule.client_certificate.client_key.path
@@ -96,7 +97,7 @@ def make_http_call(rule_id):
             hvalue = populate_placeholders(header.value)
             headers[header.key] = hvalue
             curl += " -H \"{}: {}\"".format(header.key, hvalue)
-    
+
         if rule.http_method == 'get':
             r = requests.get(url, cert=cert, headers=headers, verify=False)
         elif rule.http_method == 'post':
@@ -142,22 +143,24 @@ def make_http_call(rule_id):
                                          response_delay=float(r.elapsed.seconds + r.elapsed.microseconds / 1000000),
                                          health_check_rule=rule,
                                          success=success,
-                                         error=error, 
+                                         error=error,
                                          error_description=error_description)
 
     except Exception as e:
         error = True
         error_description = str(e)
-        HealthCheckRecord.objects.create(health_check_rule=rule, success=False, 
+        HealthCheckRecord.objects.create(health_check_rule=rule, success=False,
                                          error=error, error_description=error_description)
+
 
 def populate_placeholders(input):
     variables = re.findall(r'{{([a-zA-Z0-9._-]+)}}', input)
     for variable in variables:
         val = r.get(variable)
         input = input.replace('{{' + variable + '}}', str(val))
-    
+
     return input
+
 
 def cache_placeholders(json_payload, keys_string):
     if not keys_string:
@@ -169,7 +172,7 @@ def cache_placeholders(json_payload, keys_string):
         parts = key.split('=>')
         if len(parts) == 2:
             name = parts[1]
-        key = parts[0] 
+        key = parts[0]
         ks = key.split('__')
         v = json_payload
         for k in ks:
