@@ -1,7 +1,11 @@
 from django.contrib import admin
 from .models import *
 from django.utils.translation import gettext
+from django.conf import settings
+import redis
 
+
+r = redis.Redis(host=settings.AWT_REDIS_HOST, port=settings.AWT_REDIS_PORT, db=1, decode_responses=True)
 
 def enable_all(modeladmin, request, queryset):
     queryset.update(enable=True)
@@ -47,3 +51,13 @@ class ClientCertificateAdmin(admin.ModelAdmin):
 @admin.register(Header)
 class HeaderAdmin(admin.ModelAdmin):
     list_display = ('key', 'value')
+
+
+@admin.register(EnvironmentVariable)
+class EnvironmentVariablesAdmin(admin.ModelAdmin):
+    list_display = ('key', 'value')
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            r.delete(obj.key)
+        super(EnvironmentVariablesAdmin, self).delete_queryset(request, queryset)

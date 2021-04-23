@@ -1,5 +1,9 @@
 from django.db import models
+from django.conf import settings
+import redis
 
+
+r = redis.Redis(host=settings.AWT_REDIS_HOST, port=settings.AWT_REDIS_PORT, db=1, decode_responses=True)
 
 class Header(models.Model):
     key = models.CharField(max_length=100)
@@ -7,6 +11,22 @@ class Header(models.Model):
 
     def __str__(self):
         return self.key + " : " + self.value
+
+
+class EnvironmentVariable(models.Model):
+    key = models.CharField(max_length=100, unique=True)
+    value = models.CharField(max_length=1024)
+
+    def __str__(self):
+        return self.key + " : " + self.value
+
+    def save(self, *args, **kwargs):
+        r.set(self.key, self.value)
+        super(EnvironmentVariable, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        r.delete(self.key)
+        super(EnvironmentVariable, self).delete(*args, **kwargs)
 
 
 class ClientCertificate(models.Model):
