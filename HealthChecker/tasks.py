@@ -27,7 +27,6 @@ def check_health():
     print("Health check starts to run " + str(rules.count()) + " rules")
 
     dependent_rules = rules.filter(run_after__isnull=False, enable=True)
-
     for rule in dependent_rules:
         if rule.id in seen:
             continue
@@ -77,7 +76,6 @@ def make_http_call(rule_id):
     cert = None
     success = False
     url = rule.url
-
     url = populate_placeholders(url)
 
     curl = "curl -X {} \"{}\"".format(str(rule.http_method).upper(), url)

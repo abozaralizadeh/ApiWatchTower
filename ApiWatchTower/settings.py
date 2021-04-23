@@ -157,7 +157,8 @@ AAD_USER_STATIC_MAPPING = {'is_staff': True}  # , 'is_superuser': True
 AAD_USER_MAPPING = {'username': 'email', 'first_name': 'name'}
 AAD_GROUP_MAPPING = {'admin': 'admins', }
 AAD_GROUP_STATIC_MAPPING = {'members', }
-
+#CELERY_RDBSIG=1
+#CELERY_ALWAYS_EAGER = True
 try:
     HTTPS = get_env_value('HTTPS')
 except:
