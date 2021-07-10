@@ -1,0 +1,975 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 3,
+  "iteration": 1621506193786,
+  "links": [],
+  "panels": [
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 0,
+        "y": 0
+      },
+      "id": 14,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "Api Watch Tower",
+          "url": "http://localhost/admin"
+        }
+      ],
+      "options": {
+        "content": "<a href=\"http://localhost/admin\"><img src=\"http://localhost/admin/static/favicon.png\" width=\"auto\" height=\"auto\"  /></a>",
+        "mode": "html"
+      },
+      "pluginVersion": "7.3.6",
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": false,
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  response_delay\nFROM \"HealthChecker_healthcheckrecord\"\nWHERE\n  $__timeFilter(\"timestamp\")\nORDER BY 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "response_delay"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "\"HealthChecker_healthcheckrecord\"",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Admin",
+      "type": "text"
+    },
+    {
+      "bgColor": null,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 10,
+        "x": 2,
+        "y": 0
+      },
+      "id": 20,
+      "pluginVersion": "7.2.0",
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  CAST(success AS INT) / response_delay,\n  \"HealthChecker_healthcheckrule\".name\nFROM \"HealthChecker_healthcheckrecord\"\nINNER JOIN \"HealthChecker_healthcheckrule\" on \"HealthChecker_healthcheckrule\".id = health_check_rule_id\nWHERE\n  $__timeFilter(\"timestamp\") \n  and description ~ ${Relation}(STRING_TO_ARRAY('${Tags:raw}', ','))\nORDER BY 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "response_delay"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "\"HealthChecker_healthcheckrecord\"",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Health",
+      "trafficLightSettings": {
+        "digits": 1,
+        "fontColor": "#5794F2",
+        "fontSize": "12px",
+        "greenThreshold": 0.99,
+        "invertScale": false,
+        "lightsPerLine": 5,
+        "linkTargetBlank": false,
+        "linkTooltip": "",
+        "linkUrl": "",
+        "max": 1000,
+        "redThreshold": 0,
+        "renderLink": false,
+        "showTrend": false,
+        "showValue": false,
+        "sortLights": false,
+        "spreadControls": true,
+        "units": "",
+        "width": 20
+      },
+      "type": "snuids-trafficlights-panel"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 0.5
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "text": {}
+      },
+      "pluginVersion": "7.3.6",
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\r\n  \"timestamp\" AS \"time\",\r\n  response_delay,\r\n  \"HealthChecker_healthcheckrule\".name\r\nFROM \"HealthChecker_healthcheckrecord\"\r\nINNER JOIN \"HealthChecker_healthcheckrule\" on \"HealthChecker_healthcheckrule\".id = health_check_rule_id\r\nWHERE\r\n  $__timeFilter(\"timestamp\") \r\n  and description ~ ${Relation}(STRING_TO_ARRAY('${Tags:raw}', ','))\r\nORDER BY 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "response_delay"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "\"HealthChecker_healthcheckrecord\"",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Average Delay",
+      "type": "bargauge"
+    },
+    {
+      "dashboardFilter": "",
+      "dashboardTags": [],
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "folderId": null,
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 0
+      },
+      "id": 12,
+      "limit": 10,
+      "nameFilter": "",
+      "onlyAlertsOnDashboard": false,
+      "show": "current",
+      "sortOrder": 1,
+      "stateFilter": [],
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": false,
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  response_delay\nFROM \"HealthChecker_healthcheckrecord\"\nWHERE\n  $__timeFilter(\"timestamp\")\nORDER BY 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "response_delay"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "\"HealthChecker_healthcheckrecord\"",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "alert list",
+      "type": "alertlist"
+    },
+    {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                3
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "B",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "message": "ApiWatchTower: Alert!",
+        "name": "Response Delay alert",
+        "noDataState": "no_data",
+        "notifications": []
+      },
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "links": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": []
+          }
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 4,
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "hiddenSeries": false,
+      "id": 4,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.6",
+      "pointradius": 1,
+      "points": true,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  response_delay * CAST(success AS int),\n  \"HealthChecker_healthcheckrule\".name\nFROM \"HealthChecker_healthcheckrecord\"\nINNER JOIN \"HealthChecker_healthcheckrule\" on \"HealthChecker_healthcheckrule\".id = health_check_rule_id\nWHERE\n  $__timeFilter(\"timestamp\") --and success \n  and description ~ ${Relation}(STRING_TO_ARRAY('${Tags:raw}', ','))\n  -- and description LIKE '%${TAGS:raw}%'\nORDER BY 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "response_delay"
+                ],
+                "type": "column"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "health_check_rule_id"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "\"HealthChecker_healthcheckrecord\"",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "format": "time_series",
+          "group": [],
+          "hide": true,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  response_delay * CAST(success AS int),\n  \"HealthChecker_healthcheckrule\".name\nFROM \"HealthChecker_healthcheckrecord\"\nINNER JOIN \"HealthChecker_healthcheckrule\" on \"HealthChecker_healthcheckrule\".id = health_check_rule_id\nWHERE\n  $__timeFilter(\"timestamp\") --and success\nORDER BY 1",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "response_delay"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "\"HealthChecker_healthcheckrecord\"",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 3
+        }
+      ],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Response Delay",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:4865",
+          "format": "s",
+          "label": null,
+          "logBase": 2,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:4866",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "cards": {
+        "cardPadding": 0,
+        "cardRound": 10
+      },
+      "color": {
+        "cardColor": "#b4ff00",
+        "colorScale": "linear",
+        "colorScheme": "interpolateOranges",
+        "exponent": 0.5,
+        "max": 1,
+        "min": 0,
+        "mode": "spectrum"
+      },
+      "dataFormat": "tsbuckets",
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": []
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "heatmap": {},
+      "hideZeroBuckets": false,
+      "highlightCards": true,
+      "id": 16,
+      "legend": {
+        "show": false
+      },
+      "pluginVersion": "7.2.0",
+      "repeat": null,
+      "reverseYBuckets": false,
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  CAST(success AS INT),\n  \"HealthChecker_healthcheckrule\".name\nFROM \"HealthChecker_healthcheckrecord\"\nINNER JOIN \"HealthChecker_healthcheckrule\" on \"HealthChecker_healthcheckrule\".id = health_check_rule_id\nWHERE\n  $__timeFilter(\"timestamp\")\n  and description ~ ${Relation}(STRING_TO_ARRAY('${Tags:raw}', ','))\nORDER BY 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "response_delay"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "\"HealthChecker_healthcheckrecord\"",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Success",
+      "tooltip": {
+        "show": true,
+        "showHistogram": false
+      },
+      "tooltipDecimals": null,
+      "type": "heatmap",
+      "xAxis": {
+        "show": true
+      },
+      "xBucketNumber": null,
+      "xBucketSize": null,
+      "yAxis": {
+        "decimals": null,
+        "format": "short",
+        "logBase": 1,
+        "max": null,
+        "min": null,
+        "show": true,
+        "splitFactor": null
+      },
+      "yBucketBound": "middle",
+      "yBucketNumber": null,
+      "yBucketSize": null
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
+      "hiddenSeries": false,
+      "id": 18,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.6",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "repeat": null,
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": true,
+      "steppedLine": false,
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  CAST(response_code AS INT),\n  \"HealthChecker_healthcheckrule\".name\nFROM \"HealthChecker_healthcheckrecord\"\nINNER JOIN \"HealthChecker_healthcheckrule\" on \"HealthChecker_healthcheckrule\".id = health_check_rule_id\nWHERE\n  $__timeFilter(\"timestamp\")\n  and description ~ ${Relation}(STRING_TO_ARRAY('${Tags:raw}', ','))\nORDER BY 1",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "response_delay"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "\"HealthChecker_healthcheckrecord\"",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Status Code",
+      "tooltip": {
+        "shared": true,
+        "sort": 2,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:4996",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        },
+        {
+          "$$hashKey": "object:4997",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": null,
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "response_code"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 51
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "response_delay"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 126
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "success"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 71
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 173
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 192
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "error"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 56
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 21
+      },
+      "id": 10,
+      "options": {
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "7.3.6",
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\r\n  \"HealthChecker_healthcheckrule\".name,\r\n  response_code,\r\n  response_delay,\r\n  success,\r\n  error,\r\n  \"timestamp\" AS \"time\",\r\n  response_body,\r\n  error_description\r\nFROM \"HealthChecker_healthcheckrecord\"\r\nINNER JOIN \"HealthChecker_healthcheckrule\" on \"HealthChecker_healthcheckrule\".id = health_check_rule_id\r\nWHERE\r\n  $__timeFilter(\"timestamp\")\r\n  and description ~ ${Relation}(STRING_TO_ARRAY('${Tags:raw}', ','))\r\nORDER BY timestamp desc\r\nlimit 20",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "health_check_rule_id"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "\"HealthChecker_healthcheckrecord\"",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamptz",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Table View",
+      "type": "table"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 26,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "tags": [],
+          "text": [
+            "#demo"
+          ],
+          "value": [
+            "#demo"
+          ]
+        },
+        "datasource": "AWT_PostgreSQL",
+        "definition": "select unnest(STRING_TO_ARRAY(REGEXP_REPLACE(description, '\\s+', ' '), ' '))\nFROM \"HealthChecker_healthcheckrule\"",
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": "",
+        "multi": true,
+        "name": "Tags",
+        "options": [],
+        "query": "select unnest(STRING_TO_ARRAY(REGEXP_REPLACE(description, '\\s+', ' '), ' '))\nFROM \"HealthChecker_healthcheckrule\"",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "Any",
+          "value": "Any"
+        },
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": null,
+        "multi": false,
+        "name": "Relation",
+        "options": [
+          {
+            "selected": true,
+            "text": "Any",
+            "value": "Any"
+          },
+          {
+            "selected": false,
+            "text": "All",
+            "value": "All"
+          }
+        ],
+        "query": "Any,All",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-3h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "Dashboard Template",
+  "uid": "Dashboard-Template",
+  "version": 10
+}
