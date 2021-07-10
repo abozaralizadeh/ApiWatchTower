@@ -5,6 +5,7 @@ import redis
 
 r = redis.Redis(host=settings.AWT_REDIS_HOST, port=settings.AWT_REDIS_PORT, db=1, decode_responses=True)
 
+
 class Header(models.Model):
     key = models.CharField(max_length=100)
     value = models.CharField(max_length=1024)

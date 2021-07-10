@@ -7,18 +7,29 @@ import redis
 
 r = redis.Redis(host=settings.AWT_REDIS_HOST, port=settings.AWT_REDIS_PORT, db=1, decode_responses=True)
 
+
 def enable_all(modeladmin, request, queryset):
     queryset.update(enable=True)
 
 
-enable_all.short_description = gettext("Enable all")
+enable_all.short_description = gettext("Enable")
 
 
 def disable_all(modeladmin, request, queryset):
     queryset.update(enable=False)
 
 
-disable_all.short_description = gettext("Disable all")
+disable_all.short_description = gettext("Disable")
+
+
+def duplicate_all(modeladmin, request, queryset):
+    for obj in queryset:
+        obj.name = "Copy of " + obj.name
+        obj.id = None
+        obj.save()
+
+
+duplicate_all.short_description = gettext("Duplicate")
 
 
 # Register your models here.
@@ -27,7 +38,7 @@ class HealthCheckRuleAdmin(admin.ModelAdmin):
     list_display = ('name', 'http_method', 'url', 'enable', 'description')
     search_fields = ['id', 'name', 'description']
     list_filter = ('http_method', 'enable')
-    actions = [enable_all, disable_all]
+    actions = [enable_all, disable_all, duplicate_all]
 
 
 @admin.register(HealthCheckRecord)
