@@ -3,11 +3,11 @@ version: '3'
 
 services:
   postgres:
-    image: postgres:12
-    container_name: 'abozar_app_postgres'
+    image: postgres:13
+    container_name: 'postgres'
     restart: always
     environment:
-      #- POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_DB=AWT
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -18,7 +18,7 @@ services:
 #    logging:
 #        driver: none
   redis:
-    image: redis
+    image: redis:latest
     restart: always
     container_name: 'redis'
     command: redis-server
