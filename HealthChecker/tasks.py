@@ -2,7 +2,6 @@
 from __future__ import absolute_import, unicode_literals
 from .models import *
 from celery import shared_task
-from celery.task import periodic_task
 from datetime import datetime, timedelta
 import requests
 import re

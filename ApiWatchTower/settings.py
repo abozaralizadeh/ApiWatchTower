@@ -57,6 +57,7 @@ MIDDLEWARE = [
     #    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 ]
 
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 ROOT_URLCONF = 'ApiWatchTower.urls'
 
 # Template configuration
@@ -96,6 +97,8 @@ DATABASES = {
         'PORT': get_env_value('AWT_PG_PORT', 5432)
     }
 }
+
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
