@@ -1,5 +1,8 @@
 
-# Api Watch Tower (AWT) [![Docker](https://img.shields.io/docker/cloud/build/eaudeweb/scratch?label=Docker&style=flat)](https://hub.docker.com/r/abo0zar/api_watch_tower/tags)
+# Api Watch Tower (AWT)
+[![Docker](https://img.shields.io/docker/cloud/build/eaudeweb/scratch?label=Docker&style=for-the-badge&logo=docker)](https://hub.docker.com/r/abo0zar/api_watch_tower) [![Docker](https://img.shields.io/docker/v/abo0zar/api_watch_tower?style=for-the-badge&logo=docker)](https://hub.docker.com/r/abo0zar/api_watch_tower/tags)
+[![MIT Lisence](https://img.shields.io/github/license/abozaralizadeh/api_watch_tower?style=for-the-badge)](https://github.com/abozaralizadeh/ApiWatchTower/blob/master/LICENSE)
+
 
 AWT is an open-source Django application for deep real-time API monitoring by periodical calls and evaluating the results, not only as a health checker but also for controlling the integrity and getting alerts in case of any unexpected changes to the result payload itself. Aimed to use along with other tools like Grafana to visualise the data and setting alert systems.
 
