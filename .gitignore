@@ -122,3 +122,4 @@ grafana-storage/*
 postgres-data/*
 ApiWatchTower/settings_test.py
 certificates/
+.DS_Store
