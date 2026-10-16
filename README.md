@@ -1,7 +1,7 @@
 
 # Api Watch Tower (AWT)
 [![Docker](https://img.shields.io/docker/cloud/build/eaudeweb/scratch?label=Docker&style=for-the-badge&logo=docker)](https://hub.docker.com/r/abo0zar/api_watch_tower) [![Docker](https://img.shields.io/docker/v/abo0zar/api_watch_tower?style=for-the-badge&logo=docker)](https://hub.docker.com/r/abo0zar/api_watch_tower/tags)
-[![MIT Lisence](https://img.shields.io/github/license/abozaralizadeh/api_watch_tower?style=for-the-badge)](https://github.com/abozaralizadeh/ApiWatchTower/blob/master/LICENSE)
+[![MIT License](https://img.shields.io/github/license/abozaralizadeh/api_watch_tower?style=for-the-badge)](https://github.com/abozaralizadeh/ApiWatchTower/blob/master/LICENSE)
 
 
 AWT is an open-source Django application for deep real-time API monitoring by periodical calls and evaluating the results, not only as a health checker but also for controlling the integrity and getting alerts in case of any unexpected changes to the result payload itself. Aimed to use along with other tools like Grafana to visualise the data and setting alert systems.
@@ -95,7 +95,7 @@ For more info visit [this post](https://abozar-alizadeh.medium.com/api-watch-tow
 ## Requirements
 
 AWT works with Postgres as the database and to monitor the results you can use grafana. 
-Also Redis is used as a broker for AWT celery workers. use nginx to serve both AWT and Grafana on the same port if needed, in that case yu need to run grafana behind a reverse proxy,
+Also Redis is used as a broker for AWT celery workers. use nginx to serve both AWT and Grafana on the same port if needed, in that case you need to run grafana behind a reverse proxy,
 visit grafana documentation to achieve to that goal here: [run grafana behind a proxy](https://grafana.com/tutorials/run-grafana-behind-a-proxy/#2)
 
 ## Configurations
@@ -133,7 +133,7 @@ Can have the values 'on' and 'off'
 #### AWT_PG_PORT
 **default:** 5432
 
-There are also some settings related to the configuration of Azure Active Directory login that can be find here: [django-azure-ad-auth](https://github.com/abozaralizadeh/django-azure-ad-auth)
+There are also some settings related to the configuration of Azure Active Directory login that can be found here: [django-azure-ad-auth](https://github.com/abozaralizadeh/django-azure-ad-auth)
 
 Also to configure Grafana you can visit the official documentations but some useful configurations are suggested here:
 
