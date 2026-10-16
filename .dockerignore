@@ -1,0 +1,2 @@
+# Keep the Compose secrets file out of images built from this folder.
+.env
