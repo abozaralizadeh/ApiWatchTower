@@ -16,6 +16,7 @@ Celery broker and result backend, and also holds the variables used by `{{placeh
 ## Commands
 
 ```bash
+cp .env.example .env                   # then replace the values; compose refuses to start without the passwords
 docker compose up -d --build           # postgres, redis, web (:8000), celery, celery-beat, grafana (:3000)
 docker compose logs -f celery          # task output
 
@@ -23,6 +24,7 @@ docker compose logs -f celery          # task output
 pip install -r requirements.txt        # django-azure-ad-auth installs from GitHub, so git is needed
 docker compose up -d postgres redis    # docker-compose.yml publishes 5432 and 6379
 export AWT_PG_HOST=localhost AWT_REDIS_HOST=localhost
+export AWT_PG_PASSWORD=...             # the POSTGRES_PASSWORD from .env
 python manage.py migrate auth && python manage.py migrate   # this order matters (see gotchas)
 python manage.py runserver 0.0.0.0:8000
 celery -A ApiWatchTower worker -B --concurrency=10
@@ -40,7 +42,7 @@ There is no real test suite: `HealthChecker/tests.py` is the template placeholde
 ApiWatchTower/            Django project
   settings.py             all settings; env vars via get_env_settings.get_env_value(name, default)
   celery.py               Celery app (CELERY_* settings, autodiscovers tasks)
-  urls.py                 / -> /admin/, admin, jet, azure/ + /login/ + /complete/ (Azure AD), /static/, /media/
+  urls.py                 / -> /admin/, admin, jet, azure/ + /login/ + /complete/ (Azure AD), /static/
 HealthChecker/            the only app
   models.py               HealthCheckRule, HealthCheckRecord, Header, ClientCertificate, EnvironmentVariable
   tasks.py                check_health, run_head_sync, make_http_call, clean_record, placeholder helpers
@@ -51,10 +53,12 @@ HealthChecker/            the only app
 templates/admin/          base_site.html (branding), login.html (adds the "Azure AD Login" button)
 static/                   collectstatic output (admin, jet, logo), committed and served by Django
 code/static/              byte-identical copy of static/; nothing references it
-certificates/             upload folder for client certificates (git-ignored except info.md; mount a volume)
+certificates/             upload folder for client certificates (MEDIA_ROOT/certificates; git-ignored except info.md)
 grafana-*-dashboard.json  Grafana dashboards that query the HealthChecker tables
 Dockerfile                python:3.7, copies the repo to /code, installs requirements; no CMD
-docker-compose.yml        local stack built from source (the README has the published-image variant)
+docker-compose.yml        local stack built from source, passwords from .env (the README has the published-image variant)
+.env.example              template for the git-ignored .env that Compose reads (passwords, AWT_SECRET_KEY)
+.dockerignore             keeps .env out of the image
 ApiWatchTower.pyproj      Visual Studio (PTVS) project file
 ```
 
@@ -80,8 +84,12 @@ ApiWatchTower.pyproj      Visual Studio (PTVS) project file
 
 ## Configuration
 
-Environment variables, read in `settings.py` (a variable with no default raises ImproperlyConfigured):
+Environment variables, read in `settings.py` (a variable with no default raises ImproperlyConfigured,
+except `AWT_SECRET_KEY` and `HTTPS`):
 
+- `AWT_SECRET_KEY`: Django's `SECRET_KEY`. Unset or empty, each process generates a random key and
+  prints an `[AWT]` warning to stderr (every `manage.py` command does, `runserver` twice because of
+  the autoreloader), so sessions don't survive a restart.
 - `AWT_PG_DBNAME`, `AWT_PG_USERNAME`, `AWT_PG_PASSWORD`, `AWT_PG_HOST`, `AWT_PG_PORT`: PostgreSQL.
 - `AWT_REDIS_HOST`, `AWT_REDIS_PORT`: Celery broker/results (db 0) and placeholder store (db 1).
 - `AWT_LANGUAGE_CODE` (default `it`), `AWT_TIME_ZONE` (default `Europe/Rome`).
@@ -92,11 +100,16 @@ Environment variables, read in `settings.py` (a variable with no default raises 
   `runserver` (wsgiref) copies the process environment into each request's WSGI environ, where
   `HTTPS=on` makes Django build https URLs (the Azure AD redirect URI behind a TLS proxy).
 - `AWT_ADMIN`, `AWT_EMAIL`, `AWT_PASS`: read once, by migration 0009, to create the first
-  superuser. Their fallbacks are well-known defaults; set them for any real deployment.
+  superuser (defaults `admin` and `admin@django.com`). Without `AWT_PASS` the migration generates a
+  random password and prints it once, tagged `[AWT]`, in the migrate output.
 - Grafana takes `GF_*` variables (see README).
+- Docker Compose (both the repo file and the README's) reads `.env` for interpolation:
+  `POSTGRES_PASSWORD` (given to Postgres and, as `AWT_PG_PASSWORD`, to the AWT containers) and
+  `GF_SECURITY_ADMIN_PASSWORD` are required (`${VAR:?}`), `AWT_SECRET_KEY` is optional. Postgres and
+  Grafana apply their passwords only when their volumes are first created.
 
-Fixed in `settings.py`: `DEBUG = False`, `ALLOWED_HOSTS = ['*']`, a hardcoded `SECRET_KEY`,
-`STATIC_ROOT = static/`.
+Fixed in `settings.py`: `DEBUG = False`, `ALLOWED_HOSTS = ['*']`, `STATIC_ROOT = static/`,
+`MEDIA_ROOT = BASE_DIR` (the repo root, `/code` in the image). `MEDIA_URL` is unset.
 
 ## Gotchas
 
@@ -104,7 +117,10 @@ Fixed in `settings.py`: `DEBUG = False`, `ALLOWED_HOSTS = ['*']`, a hardcoded `S
   real `User` model but does not depend on `auth`, and Django plans `HealthChecker` (capital H
   sorts first) before `auth`, so a plain `migrate` fails on the missing `auth_user` table. The
   compose commands already do this.
-- Uploaded client certificates and keys are stored under `./certificates/`.
+- Uploaded client certificates and keys are saved to `MEDIA_ROOT/certificates/` and the database
+  stores the relative path (`certificates/<file>`); only the Celery task reads them, and no route
+  serves them (the admin's "Currently" link on a certificate answers 404). The worker must see the same folder as `web`: docker-compose.yml mounts no volume
+  there, so mount one at `/code/certificates` in both containers.
 - With `DEBUG = False`, static files come from the explicit `serve` routes in `urls.py`, reading the
   committed `static/` folder. Change `HealthChecker/static` or templates, run collectstatic, commit.
 - `urls.py` uses `django.conf.urls.url`, removed in Django 4.0: moving past 3.2 needs `re_path`.
@@ -119,5 +135,6 @@ Fixed in `settings.py`: `DEBUG = False`, `ALLOWED_HOSTS = ['*']`, a hardcoded `S
   directly (mixed-case names need double quotes) and use the `snuids-trafficlights-panel` plugin.
   Renaming models or fields breaks them.
 - `celerybeat-schedule` and `celerybeat.pid` are committed runtime files; `--pidfile=` keeps a stale
-  pid file from blocking beat. There is no `.dockerignore`, so the whole tree goes into the image.
+  pid file from blocking beat. `.dockerignore` only excludes `.env`, so the rest of the tree
+  (local `certificates/` uploads and `grafana-storage/` included) goes into the image.
 - `DATABASES` also has a `develop` SQLite alias, but nothing routes to it.

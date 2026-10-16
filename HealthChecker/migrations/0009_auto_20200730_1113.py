@@ -2,10 +2,20 @@
 
 from django.db import models, migrations
 from django.contrib.auth.models import User
+from django.utils.crypto import get_random_string
 import os
 
 def apply_migration(apps, schema_editor):
-    User.objects.create_superuser(os.environ.get('AWT_ADMIN', 'admin'), os.environ.get('AWT_EMAIL', 'admin@django.com'), os.environ.get('AWT_PASS', 'admin'))
+    username = os.environ.get('AWT_ADMIN', 'admin')
+    password = os.environ.get('AWT_PASS')
+    generated = not password
+    if generated:
+        password = get_random_string(24)
+    User.objects.create_superuser(username, os.environ.get('AWT_EMAIL', 'admin@django.com'), password)
+    if generated:
+        print('\n[AWT] AWT_PASS is not set: created superuser "{}" with the generated password: {}\n'
+              '[AWT] It is shown only once. Change it now with: python manage.py changepassword {}'
+              .format(username, password, username), flush=True)
 
 def revert_migration(apps, schema_editor):
     pass

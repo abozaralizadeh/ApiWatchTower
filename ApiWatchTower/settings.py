@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 import posixpath
+import sys
+from django.core.exceptions import ImproperlyConfigured
+from django.core.management.utils import get_random_secret_key
 from .get_env_settings import get_env_value
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -21,7 +24,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '9eb09dcc-aa29-44db-8daa-12fa6e7f8359'
+try:
+    SECRET_KEY = get_env_value('AWT_SECRET_KEY')
+except ImproperlyConfigured:
+    SECRET_KEY = None
+if not SECRET_KEY:
+    SECRET_KEY = get_random_secret_key()
+    print('[AWT] AWT_SECRET_KEY is not set: using a random secret key for this process, '
+          'so sessions will not survive a restart until AWT_SECRET_KEY is set.', file=sys.stderr)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -135,6 +145,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 # STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['static']))
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# Uploaded files (client certificates go to MEDIA_ROOT/certificates/). They are only read
+# server-side by the Celery task and are not served over HTTP.
+MEDIA_ROOT = BASE_DIR
 
 # celery
 

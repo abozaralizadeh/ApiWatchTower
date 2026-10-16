@@ -11,7 +11,16 @@ To see the demo without applying any configuration, you can use the single conta
 
 ## Installation
 
-The easiest way to setup is using the docker container ([abo0zar/api_watch_tower:latest](https://hub.docker.com/repository/docker/abo0zar/api_watch_tower)) using the following Yaml file:
+The easiest way to setup is using the docker container ([abo0zar/api_watch_tower:latest](https://hub.docker.com/repository/docker/abo0zar/api_watch_tower)) using the following Yaml file.
+The passwords are not written in it: Docker Compose reads them from a `.env` file in the same folder (see [.env.example](.env.example)), and `docker compose up` stops with an error if one is missing:
+
+```sh
+# .env (replace every value)
+POSTGRES_PASSWORD=<your Postgres password>
+GF_SECURITY_ADMIN_PASSWORD=<your Grafana admin password>
+# a long random string, e.g. from: python3 -c "import secrets; print(secrets.token_urlsafe(50))"
+AWT_SECRET_KEY=
+```
 
 
 
@@ -27,7 +36,7 @@ services:
     environment:
       - POSTGRES_DB=AWT
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     volumes:
       - postgresData:/var/lib/postgresql/data
     expose:
@@ -53,6 +62,8 @@ services:
       - AAD_TENANT_ID=xxxOptionalxxx
       - AAD_CLIENT_ID=xxxOptionalxxx
       - HTTPS=off
+      - AWT_PG_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      - AWT_SECRET_KEY=${AWT_SECRET_KEY:-}
 
   awt_worker:
     image: abo0zar/api_watch_tower:latest
@@ -61,6 +72,9 @@ services:
       - redis
       - postgres
       - awt_admin
+    environment:
+      - AWT_PG_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      - AWT_SECRET_KEY=${AWT_SECRET_KEY:-}
 
   awt_scheduler:
     image: abo0zar/api_watch_tower:latest
@@ -71,6 +85,9 @@ services:
       - postgres
       - awt_admin
       - awt_worker
+    environment:
+      - AWT_PG_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      - AWT_SECRET_KEY=${AWT_SECRET_KEY:-}
 
   grafana:
     image: grafana/grafana:latest
@@ -82,12 +99,22 @@ services:
       - postgres
     ports:
       - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD:?Set GF_SECURITY_ADMIN_PASSWORD in .env}
 
 volumes:
     postgresData:
     grafanaStorage:
 
 ```
+
+On the first start, unless `AWT_PASS` is set, AWT creates the superuser `admin` with a random password and prints it once in the log of `awt_admin` (`docker compose logs awt_admin | grep AWT`). Sign in with it and change it right away (`docker compose exec awt_admin python manage.py changepassword admin`).
+
+### Upgrading an existing install
+
+- Create the `.env` file before running `docker compose up` with the new Yaml file. Postgres and Grafana apply `POSTGRES_PASSWORD` and `GF_SECURITY_ADMIN_PASSWORD` only when their volumes are first created, so copy the Postgres password from your current `docker-compose.yml` instead of choosing a new one: AWT connects to the existing database with `POSTGRES_PASSWORD`. Grafana keeps the admin password it already has whatever the variable says (change it in Grafana itself).
+- Set `AWT_SECRET_KEY` so that sign-ins survive restarts. Without it AWT still starts, with a random key and a warning in the log.
+- Existing users, passwords and uploaded client certificates are kept as they are.
 
 
 For more info visit [this post](https://abozar-alizadeh.medium.com/api-watch-tower-7f222f1e0eb4).
@@ -132,6 +159,14 @@ Can have the values 'on' and 'off'
 
 #### AWT_PG_PORT
 **default:** 5432
+
+#### AWT_SECRET_KEY
+**default:** none
+Django's secret key, used to sign sessions. Set it to a long random string, for example the output of `python3 -c "import secrets; print(secrets.token_urlsafe(50))"`, and keep it secret. When it is not set, a random key is generated at every start (with a warning in the log), so everyone is signed out after a restart.
+
+#### AWT_ADMIN, AWT_EMAIL, AWT_PASS
+**default:** admin, admin@django.com, none
+Username, email and password of the superuser created when the database is first set up. They are not read afterwards. When `AWT_PASS` is not set, a random password is generated and printed once in the migration output; change it with `python manage.py changepassword <user>`.
 
 There are also some settings related to the configuration of Azure Active Directory login that can be found here: [django-azure-ad-auth](https://github.com/abozaralizadeh/django-azure-ad-auth)
 
